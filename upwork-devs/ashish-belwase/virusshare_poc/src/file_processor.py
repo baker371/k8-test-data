@@ -5,6 +5,7 @@ import uuid
 from src.file_service import FileService
 from src.glasswall_service import GlasswallService
 from src.scrapers import VSScraper
+from src.minio_service import Minio
 
 
 class FileProcessor:
@@ -64,8 +65,12 @@ class FileProcessor:
 
     @staticmethod
     def get_files(file_type, num_files):
-        # To Do :  to be replaced by minio file fetch service
-        files = FileProcessor.get_local_files()
+        "Downloads given number of files from a minio bucket of specific file types"
+        url = os.getenv('MINIO_URL')
+        access_key = os.getenv('MINIO_ACCESS_KEY')
+        secret_key = os.getenv('MINIO_SECRET_KEY')
+        minio = Minio(url, access_key, secret_key)
+        files = minio.download_files()
         filtered_files = [f for f in files if file_type in f.rsplit(".", 1)[1]]
         filtered_files = (
             filtered_files

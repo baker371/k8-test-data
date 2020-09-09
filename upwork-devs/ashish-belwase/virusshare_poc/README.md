@@ -35,6 +35,9 @@ To run the aforementioned built image run:
 
 `docker run -e STATIC_PATH=<static_path> -e vs_zip_pwd=<pwd> -e PYTHONUNBUFFERED=0 -e virustotal_key=<key> -e vs_api_key=<key> -p 5000:5000 -it --rm k8-test-data`
 
+To run the aforementioned built image along with minio, run:
+
+`docker-compose up --build`
 
 ## Kubernetes
 

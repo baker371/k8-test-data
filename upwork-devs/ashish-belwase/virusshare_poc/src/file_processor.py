@@ -70,7 +70,7 @@ class FileProcessor:
         access_key = os.getenv('MINIO_ACCESS_KEY')
         secret_key = os.getenv('MINIO_SECRET_KEY')
         minio = Minio(url, access_key, secret_key)
-        files = minio.download_files()
+        files = minio.download_files(file_type, num_files)
         filtered_files = [f for f in files if file_type in f.rsplit(".", 1)[1]]
         filtered_files = (
             filtered_files

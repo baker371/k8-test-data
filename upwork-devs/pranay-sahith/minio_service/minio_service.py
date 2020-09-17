@@ -12,7 +12,7 @@ log = logging.getLogger()
 class MinioService(BucketHandler):
 
     def __init__(self, url, access_key, secret_key):
-        self.minio = Minio(url=url, access_key=access_key, secret_key=secret_key)
+        self.minio = Minio(url, access_key=access_key, secret_key=secret_key)
         super().__init__(self.minio)
 
     def create_bucket(self, bucket_name, ignore_if_exists=True):

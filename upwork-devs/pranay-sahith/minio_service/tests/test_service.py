@@ -7,9 +7,10 @@ class TestMinioService(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        access_key = os.getenv("ACCESS_KEY", "minio2")
-        secret_key = os.getenv("SECRET_KEY", "minio2@123")
-        cls.minio = StorageService("http://minio.sahith.in/minio", access_key=access_key, secret_key=secret_key)
+        access_key = os.getenv("ACCESS_KEY")
+        secret_key = os.getenv("SECRET_KEY")
+        minio_host = os.getenv("STORAGE_HOST")
+        cls.minio = StorageService(minio_host, access_key=access_key, secret_key=secret_key)
 
     def test_create_bucket(self):
         test_bucket_name = "test-bucket"

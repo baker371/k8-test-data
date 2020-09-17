@@ -3,7 +3,9 @@ class to handler operations on minio server
 """
 import os
 import logging
+from uuid import uuid4
 from minio import Minio
+from elastic_service import ElasticService
 from bucket_handler import BucketHandler
 
 log = logging.getLogger()
@@ -14,6 +16,13 @@ class MinioService(BucketHandler):
     def __init__(self, url, access_key, secret_key):
         self.minio = Minio(url, access_key=access_key, secret_key=secret_key)
         super().__init__(self.minio)
+        elastic_host = os.getenv("ELASTIC_HOST", "localhost")
+        elastic_port = os.getenv("ELASTIC_PORT", "9200")
+        elastic_username = os.getenv("ELASTIC_USER")
+        elastic_password = os.getenv("ELASTIC_PASSWORD")
+        self.index_name = os.getenv("INDEX_NAME", "minio_access_data")
+        self.es = ElasticService(elastic_host, elastic_port, elastic_username, elastic_password)
+        self.es.create_index(self.index_name)
 
     def create_bucket(self, bucket_name, ignore_if_exists=True):
         """
@@ -56,6 +65,13 @@ class MinioService(BucketHandler):
             size = os.stat(local_file_name)
             with open(local_file_name, "rb") as f:
                 self.minio.put_object(bucket_name, remote_file_name, data=f, length=size)
+            guid = uuid4()
+            doc = {"action": "upload",
+                   "bucket_name": bucket_name,
+                   "local_file_name": local_file_name,
+                   "remote_file_name": remote_file_name,
+                   "file_size": size}
+            self.es.create_doc(index_name=self.index_name, id=guid, body=doc)
         except Exception as e:
             log.error(e)
 
@@ -73,6 +89,12 @@ class MinioService(BucketHandler):
             local_file_name = file_name.split("/")[-1]
             with open(local_file_name, "wb") as f:
                 f.write(data)
+            guid = uuid4()
+            doc = {"action": "upload",
+                   "bucket_name": bucket_name,
+                   "file_name": file_name
+                   }
+            self.es.create_doc(index_name=self.index_name, id=guid, body=doc)
             return local_file_name
         except Exception as e:
             log.error(e)

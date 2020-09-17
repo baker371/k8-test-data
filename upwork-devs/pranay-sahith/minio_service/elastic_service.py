@@ -14,7 +14,7 @@ log.setLevel(logging.INFO)
 logging.basicConfig( stream=sys.stdout )
 
 
-class ElasticService():
+class ElasticService:
 
     def __init__(self, host, port, username, password):
         super().__init__()
